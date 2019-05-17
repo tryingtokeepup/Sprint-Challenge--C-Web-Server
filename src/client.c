@@ -12,7 +12,8 @@
 /**
  * Struct to hold all three pieces of a URL
  */
-typedef struct urlinfo_t {
+typedef struct urlinfo_t
+{
   char *hostname;
   char *port;
   char *path;
@@ -48,6 +49,34 @@ urlinfo_t *parse_url(char *url)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  // Okay, here goes nothing. First, let's use strchr to find that first slash.
+  // I might need some sort of pointer, don't want to use the pointers given. Might need them later.
+
+  char *temp_path_parser;
+  temp_path_parser = strstr(hostname, "/");
+
+  // need to check for NULL condition:
+  if (temp_path_parser != NULL)
+  {
+
+    path = temp_path_parser + 1;
+    // Overwrite the slash with a '\0' so that we are no longer considering anything after the slash.
+    *(temp_path_parser) = '\0';
+    printf(temp_path_parser);
+  }
+  temp_path_parser = strstr(hostname, ":");
+  if (temp_path_parser != NULL)
+  {
+
+    port = temp_path_parser + 1;
+    // Overwrite the slash with a '\0' so that we are no longer considering anything after the slash.
+    *(temp_path_parser) = '\0';
+    printf(temp_path_parser);
+  }
+  // copy over everything and return the modified urlinfo
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
 
   return urlinfo;
 }
@@ -76,12 +105,13 @@ int send_request(int fd, char *hostname, char *port, char *path)
 }
 
 int main(int argc, char *argv[])
-{  
-  int sockfd, numbytes;  
+{
+  int sockfd, numbytes;
   char buf[BUFSIZE];
 
-  if (argc != 2) {
-    fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
+  if (argc != 2)
+  {
+    fprintf(stderr, "usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
 
