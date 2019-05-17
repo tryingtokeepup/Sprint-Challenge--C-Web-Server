@@ -29,8 +29,9 @@ typedef struct urlinfo_t
 urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
+  // default values for port should be 80
   char *hostname = strdup(url);
-  char *port;
+  char *port = "80";
   char *path;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
@@ -53,9 +54,17 @@ urlinfo_t *parse_url(char *url)
   // I might need some sort of pointer, don't want to use the pointers given. Might need them later.
 
   char *temp_path_parser;
-  temp_path_parser = strstr(hostname, "/");
 
+  temp_path_parser = strstr(hostname, "://");
+  if (temp_path_parser != NULL)
+  {
+    // skip ... 3 spaces down
+    hostname = temp_path_parser + 3;
+    printf("hostname: %s\n", hostname);
+    // don't think we will null anything here.
+  }
   // need to check for NULL condition:
+  temp_path_parser = strstr(hostname, "/");
   if (temp_path_parser != NULL)
   {
 
@@ -154,7 +163,7 @@ int main(int argc, char *argv[])
   while ((byte_count = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
   {
     printf("recv()'d %d bytes of data in buf\n", byte_count);
-    printf("%s", buf);
+    printf("%s\n", buf);
   }
 
   //5. Clean up any allocated memory and open file descriptors.
