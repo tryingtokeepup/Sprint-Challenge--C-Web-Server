@@ -32,24 +32,10 @@ urlinfo_t *parse_url(char *url)
   // default values for port should be 80
   char *hostname = strdup(url);
   char *port = "80";
-  char *path;
+  char *path = "/";
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
-  /*
-    We can parse the input URL by doing the following:
-
-    1. Use strchr to find the first slash in the URL (this is assuming there is no http:// or https:// in the URL).
-    2. Set the path pointer to 1 character after the spot returned by strchr.
-    3. Overwrite the slash with a '\0' so that we are no longer considering anything after the slash.
-    4. Use strchr to find the first colon in the URL.
-    5. Set the port pointer to 1 character after the spot returned by strchr.
-    6. Overwrite the colon with a '\0' so that we are just left with the hostname.
-  */
-
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
   // Okay, here goes nothing. First, let's use strchr to find that first slash.
   // I might need some sort of pointer, don't want to use the pointers given. Might need them later.
 
@@ -112,7 +98,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   // guess we have to keep the connection closed
   int request_length = sprintf(request, "GET /%s HTTP/1.1\n"
                                         "Host: %s:%s\n"
-                                        "Connection: Close\n",
+                                        "Connection: close\n",
                                path, hostname, port);
 
   // sen
@@ -137,17 +123,6 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-  /*
-    1. Parse the input URL
-    2. Initialize a socket by calling the `get_socket` function from lib.c
-    3. Call `send_request` to construct the request and send it
-    4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
-    5. Clean up any allocated memory and open file descriptors.
-  */
-
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
   // parse it, catch it - make sure to free any malloc'd memory
   urlinfo_t *urlinfo = parse_url(argv[1]);
   // init socket by calling get_socket
@@ -162,7 +137,7 @@ int main(int argc, char *argv[])
   int byte_count;
   while ((byte_count = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
   {
-    printf("recv()'d %d bytes of data in buf\n", byte_count);
+    //printf("recv()'d %d bytes of data in buf\n", byte_count);
     printf("%s\n", buf);
   }
 
