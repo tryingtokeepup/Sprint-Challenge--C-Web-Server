@@ -62,7 +62,6 @@ urlinfo_t *parse_url(char *url)
     path = temp_path_parser + 1;
     // Overwrite the slash with a '\0' so that we are no longer considering anything after the slash.
     *(temp_path_parser) = '\0';
-    printf(temp_path_parser);
   }
   temp_path_parser = strstr(hostname, ":");
   if (temp_path_parser != NULL)
@@ -71,7 +70,7 @@ urlinfo_t *parse_url(char *url)
     port = temp_path_parser + 1;
     // Overwrite the slash with a '\0' so that we are no longer considering anything after the slash.
     *(temp_path_parser) = '\0';
-    printf(temp_path_parser);
+    //printf(temp_path_parser);
   }
   // copy over everything and return the modified urlinfo
   urlinfo->hostname = hostname;
@@ -96,12 +95,26 @@ int send_request(int fd, char *hostname, char *port, char *path)
   const int max_request_size = 16384;
   char request[max_request_size];
   int rv;
+  // calculate the request_length by writing up all that stuff and sprintf it
+  // first thingy will be the path, second is the hostname, third is the path. i think this is how to do it.
+  //GET /path HTTP/1.1
+  //Host: hostname:port
+  //Connection: close
+  // guess we have to keep the connection closed
+  int request_length = sprintf(request, "GET /%s HTTP/1.1\n"
+                                        "Host: %s:%s\n"
+                                        "Connection: Close\n",
+                               path, hostname, port);
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  // sen
+  rv = send(fd, request, request_length, 0);
 
-  return 0;
+  if (rv < 0)
+  {
+    perror("send");
+  }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
@@ -126,6 +139,26 @@ int main(int argc, char *argv[])
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  // parse it, catch it - make sure to free any malloc'd memory
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  // init socket by calling get_socket
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+
+  if (sockfd == -1)
+  {
+
+    printf("Yo, it didn't work out. Sorry, retry your prompt.\n");
+  }
+  int status_request = send_request(sockfd, (*urlinfo).hostname, urlinfo->port, urlinfo->path);
+  int byte_count;
+  while ((byte_count = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
+  {
+    printf("recv()'d %d bytes of data in buf\n", byte_count);
+    printf("%s", buf);
+  }
+
+  //5. Clean up any allocated memory and open file descriptors.
+  free(urlinfo);
 
   return 0;
 }
